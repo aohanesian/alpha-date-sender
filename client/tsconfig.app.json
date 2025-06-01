@@ -9,7 +9,7 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
@@ -34,7 +34,7 @@
     "esModuleInterop": true,
 
     /* Type Declarations */
-    "types": ["vite/client", "node"]
+    "types": []
   },
   "include": ["src", "src/vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
