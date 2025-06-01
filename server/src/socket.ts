@@ -1,11 +1,11 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import axios from 'axios';
-import { AppError } from './middleware/errorHandler';
-import { verifyToken } from './middleware/auth';
-import { processingStates, ProcessingState } from './types';
-import { SessionManager } from './services/sessionManager';
-import { redisService } from './services/redisService';
+import { AppError } from './middleware/errorHandler.js';
+import { verifyToken } from './middleware/auth.js';
+import { processingStates, ProcessingState } from './types.js';
+import { SessionManager } from './services/sessionManager.js';
+import { redisService } from './services/redisService.js';
 import crypto from 'crypto';
 
 // Delay constants (in milliseconds)

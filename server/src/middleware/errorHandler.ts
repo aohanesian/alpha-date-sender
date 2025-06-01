@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from '../types/express';
+import { Request, Response, NextFunction } from '../types/express.js';
 
 export class AppError extends Error {
   statusCode: number;
