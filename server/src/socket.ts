@@ -635,7 +635,7 @@ async function filterAvailableItems(
   console.log(`🚫 Loaded blocklist with ${blockedRecipients.size} blocked recipients`);
 
   // Get chat history for each item to determine recipient
-  const availableItems = [];
+  const availableItems: any[] = [];
   const processedRecipients = new Set<string>();
 
   for (const item of alphaDateFiltered) {
