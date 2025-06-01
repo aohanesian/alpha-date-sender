@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from '../types/express';
 import { AppError } from './errorHandler';
 import { CustomJwtPayload } from '../types/jwt';
 
@@ -37,4 +37,6 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   } catch (error) {
     res.status(401).json({ error: 'Please authenticate.' });
   }
-}; 
+};
+
+export const authenticate = auth; // Alias for backward compatibility 

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from '../types/express';
 import axios from 'axios';
 import { AppError } from '../middleware/errorHandler';
 

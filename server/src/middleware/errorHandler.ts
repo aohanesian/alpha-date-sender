@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from '../types/express';
 
 export class AppError extends Error {
   statusCode: number;
@@ -16,16 +16,16 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  console.error('Error:', err);
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+    res.status(err.statusCode).json({
       status: false,
       message: err.message
     });
+  } else {
+    res.status(500).json({
+      status: false,
+      message: 'Internal server error'
+    });
   }
-
-  console.error('Unhandled error:', err);
-  return res.status(500).json({
-    status: false,
-    message: 'Internal server error'
-  });
 }; 

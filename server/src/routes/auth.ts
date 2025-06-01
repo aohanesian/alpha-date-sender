@@ -2,7 +2,7 @@ import { Router } from 'express';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { AppError } from '../middleware/errorHandler';
-import { authenticate } from '../middleware/auth';
+import { auth } from '../middleware/auth';
 import { login, register } from '../controllers/auth';
 
 interface CustomJwtPayload {
@@ -69,7 +69,7 @@ router.post('/login', login);
 router.post('/register', register);
 
 // Refresh token endpoint
-router.post('/refresh', authenticate, async (req, res) => {
+router.post('/refresh', auth, async (req, res) => {
   try {
     const { operatorId } = req.user as CustomJwtPayload;
 
