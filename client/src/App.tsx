@@ -42,7 +42,7 @@ const AppContent: React.FC = () => {
         window.dispatchEvent(event);
       } : undefined} />
       <main className="flex-grow">
-        <Routes>
+      <Routes>
           <Route path="/" element={
             <PublicRoute>
               <Login />
@@ -53,7 +53,7 @@ const AppContent: React.FC = () => {
               <Dashboard />
             </ProtectedRoute>
           } />
-        </Routes>
+      </Routes>
       </main>
       <Footer />
     </div>

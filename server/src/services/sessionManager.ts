@@ -19,7 +19,7 @@ export class SessionManager {
     }
     
     try {
-      await redisService.connect();
+    await redisService.connect();
       this.initialized = true;
     } catch (error) {
       console.error('Failed to initialize SessionManager:', error);
