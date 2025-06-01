@@ -360,11 +360,11 @@ export const setupSocketHandlers = (io: Server) => {
       try {
         const result = await sessionManager.stopProcessing(socket, user.operatorId, data.profileId, data.type);
       
-      if (!result.success) {
+        if (!result.success) {
           console.error('Failed to stop processing:', result.reason);
-        socket.emit('error', { message: result.reason });
-        return;
-      }
+          socket.emit('error', { message: result.reason });
+          return;
+        }
 
         // Get device ID from session
         const deviceId = sessionManager.getDeviceIdForSocket(socket.id);
@@ -394,6 +394,57 @@ export const setupSocketHandlers = (io: Server) => {
         console.error('Error in stopProcessing handler:', error);
         socket.emit('error', { 
           message: 'Failed to stop processing: ' + (error instanceof Error ? error.message : 'Unknown error')
+        });
+      }
+    });
+
+    socket.on('stopAllProcessing', async () => {
+      console.log('Stop all processing request received:', {
+        operatorId: user?.operatorId,
+        socketId: socket.id
+      });
+
+      if (!user?.operatorId) {
+        socket.emit('error', { message: 'User not authenticated' });
+        return;
+      }
+
+      try {
+        // Get device ID from session
+        const deviceId = sessionManager.getDeviceIdForSocket(socket.id);
+        if (!deviceId) {
+          console.error('No device ID found in session');
+          socket.emit('error', { message: 'Device not registered' });
+          return;
+        }
+
+        // Stop all processing through session manager
+        const result = await sessionManager.stopAllProcessing(socket, user.operatorId);
+        
+        if (!result.success) {
+          console.error('Failed to stop all processing:', result.reason);
+          socket.emit('error', { message: result.reason });
+          return;
+        }
+
+        // Emit success event
+        socket.emit('allProcessingStopped', {
+          deviceId,
+          stoppedBy: deviceId,
+          message: 'All processing stopped successfully',
+          stoppedAt: Date.now(),
+          stoppedProfiles: result.stoppedProfiles
+        });
+
+        console.log('All processing stopped successfully:', { 
+          operatorId: user.operatorId,
+          deviceId,
+          stoppedProfiles: result.stoppedProfiles
+        });
+      } catch (error) {
+        console.error('Error in stopAllProcessing handler:', error);
+        socket.emit('error', { 
+          message: 'Failed to stop all processing: ' + (error instanceof Error ? error.message : 'Unknown error')
         });
       }
     });

@@ -9,6 +9,8 @@ interface Profile {
   status: string;
 }
 
+const ALPHA_DATE_API_URL = 'https://alpha.date/api';
+
 export const getProfiles = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const alphaDateToken = req.headers['x-alpha-date-token'];
@@ -17,8 +19,13 @@ export const getProfiles = async (req: Request, res: Response, next: NextFunctio
       throw new AppError('Alpha Date token is required', 401);
     }
 
+    console.log('Fetching profiles with Alpha Date token:', {
+      hasAlphaDateToken: !!alphaDateToken,
+      tokenLength: alphaDateToken.length
+    });
+
     const response = await axios.get<Profile[]>(
-      `${process.env.ALPHA_DATE_API_URL}/operator/profiles`,
+      `${ALPHA_DATE_API_URL}/operator/profiles`,
       {
         headers: {
           'Authorization': `Bearer ${alphaDateToken}`
@@ -26,8 +33,14 @@ export const getProfiles = async (req: Request, res: Response, next: NextFunctio
       }
     );
 
+    console.log('Alpha Date API response:', {
+      status: response.status,
+      dataLength: response.data?.length
+    });
+
     res.json(response.data);
   } catch (error) {
+    console.error('Error in getProfiles:', error);
     if (axios.isAxiosError(error)) {
       next(new AppError(error.response?.data?.message || 'Failed to fetch profiles', error.response?.status || 500));
     } else {
@@ -46,7 +59,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     }
 
     const response = await axios.put(
-      `${process.env.ALPHA_DATE_API_URL}/operator/profiles/${id}`,
+      `${ALPHA_DATE_API_URL}/operator/profiles/${id}`,
       req.body,
       {
         headers: {

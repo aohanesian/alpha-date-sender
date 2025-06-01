@@ -73,44 +73,23 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (!user?.token || !user?.alphaDateToken) {
-      console.log('Missing required tokens:', { 
-        hasToken: !!user?.token, 
-        hasAlphaDateToken: !!user?.alphaDateToken 
-      });
-      navigate('/login');
+      console.log('Missing token or alphaDateToken, skipping socket connection');
       return;
     }
 
-    // Cleanup existing socket connection
-    if (socketRef.current) {
-      console.log('Cleaning up existing socket connection...');
-      socketRef.current.disconnect();
-      socketRef.current = null;
-    }
-
-    console.log('Initializing socket connection with token:', user.token);
-    // Initialize socket connection
+    console.log('Initializing socket connection...');
     const newSocket = io(SOCKET_URL, {
-      withCredentials: true,
-      transports: ['websocket', 'polling'],
       auth: {
-        token: user.token,
-        operatorId: user.operatorId
-      },
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      forceNew: true
+        token: user.token
+      }
     });
 
     socketRef.current = newSocket;
 
     newSocket.on('connect', () => {
-      console.log('Socket connected successfully:', {
+      console.log('Socket connected:', {
         id: newSocket.id,
-        connected: newSocket.connected,
-        hasToken: !!user?.token,
-        operatorId: user?.operatorId
+        connected: newSocket.connected
       });
       setValidationErrors(prev => {
         const newErrors = { ...prev };
@@ -118,6 +97,16 @@ const Dashboard: React.FC = () => {
         return newErrors;
       });
     });
+
+    // Add event listener for stopAllProcessing
+    const handleStopAllProcessing = () => {
+      if (!socketRef.current) return;
+
+      console.log('Stopping all processing...');
+      socketRef.current.emit('stopAllProcessing');
+    };
+
+    window.addEventListener('stopAllProcessing', handleStopAllProcessing);
 
     newSocket.on('deviceRegistered', (data) => {
       console.log('Device registered:', data);
@@ -282,6 +271,48 @@ const Dashboard: React.FC = () => {
           }
         }));
       }
+    });
+
+    newSocket.on('allProcessingStopped', (data) => {
+      console.log('All processing stopped event received:', data);
+      const { deviceId, stoppedBy, stoppedProfiles } = data;
+      const isOwnDevice = deviceId === deviceIdRef.current || stoppedBy === deviceIdRef.current;
+
+      // Stop all chat processing
+      setProcessingChat(prev => {
+        const newState = { ...prev };
+        Object.keys(newState).forEach(profileId => {
+          newState[profileId] = {
+            ...newState[profileId],
+            isProcessing: false,
+            isPending: false,
+            status: isOwnDevice ? '⏹️ Processing stopped' : '⏹️ Stopped on another device',
+            messageCount: newState[profileId]?.messageCount || 0,
+            deviceId: deviceId || stoppedBy,
+            isOwnDevice
+          };
+        });
+        return newState;
+      });
+
+      // Stop all mail processing
+      setProcessingMail(prev => {
+        const newState = { ...prev };
+        Object.keys(newState).forEach(profileId => {
+          newState[profileId] = {
+            ...newState[profileId],
+            isProcessing: false,
+            isPending: false,
+            status: isOwnDevice ? '⏹️ Processing stopped' : '⏹️ Stopped on another device',
+            messageCount: newState[profileId]?.messageCount || 0,
+            deviceId: deviceId || stoppedBy,
+            isOwnDevice
+          };
+        });
+        return newState;
+      });
+
+      toast.success('All processing stopped successfully');
     });
 
     newSocket.on('processingInterrupted', (data) => {
@@ -475,8 +506,9 @@ const Dashboard: React.FC = () => {
         socketRef.current = null;
       }
       deviceIdRef.current = null;
+      window.removeEventListener('stopAllProcessing', handleStopAllProcessing);
     };
-  }, [user?.token, user?.operatorId]);
+  }, [user?.token, user?.alphaDateToken]);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -503,7 +535,7 @@ const Dashboard: React.FC = () => {
         if (!response.ok) {
           if (response.status === 401) {
             console.log('Unauthorized, redirecting to login');
-            navigate('/login');
+            navigate('/');
             return;
           }
           throw new Error('Failed to fetch profiles');

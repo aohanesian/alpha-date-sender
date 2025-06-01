@@ -1,10 +1,10 @@
 import express from 'express';
 import axios from 'axios';
 import { AppError } from '../middleware/errorHandler';
-import { auth } from '../middleware/auth';
 import { getProfiles, updateProfile } from '../controllers/profiles';
 
 const router = express.Router();
+const ALPHA_DATE_API_URL = 'https://alpha.date/api';
 
 interface Profile {
   id: number;
@@ -33,7 +33,7 @@ interface Folder {
 }
 
 // Get profiles
-router.get('/', auth, getProfiles);
+router.get('/', getProfiles);
 
 // Get attachments
 router.get('/:profileId/attachments', async (req, res, next) => {
@@ -51,7 +51,7 @@ router.get('/:profileId/attachments', async (req, res, next) => {
 
     for (const type of types) {
       const response = await axios.get(
-        `${process.env.ALPHA_DATE_API_URL}/files/${type}?external_id=${profileId}${forceRefresh === 'true' ? '&force_refresh=true' : ''}`,
+        `${ALPHA_DATE_API_URL}/files/${type}?external_id=${profileId}${forceRefresh === 'true' ? '&force_refresh=true' : ''}`,
         {
           headers: {
             'Authorization': `Bearer ${alphaDateToken}`
@@ -88,6 +88,6 @@ router.get('/:profileId/attachments', async (req, res, next) => {
   }
 });
 
-router.put('/:id', auth, updateProfile);
+router.put('/:id', updateProfile);
 
 export { router as profilesRouter }; 

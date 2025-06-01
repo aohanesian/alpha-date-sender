@@ -46,6 +46,7 @@ router.post('/login', async (req, res, next) => {
         // Check whitelist
         console.log('Checking whitelists...');
         const whitelistedEmails = await getWhitelistedEmails();
+        console.log('Whitelisted emails:', whitelistedEmails);
         console.log('Whitelist check:', {
             email: email.toLowerCase(),
             isWhitelisted: whitelistedEmails.includes(email.toLowerCase())

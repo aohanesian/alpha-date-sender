@@ -11,18 +11,29 @@ import { profilesRouter } from './routes/profiles';
 
 const app = express();
 const httpServer = createServer(app);
+
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.CLIENT_URL
+].filter((origin): origin is string => Boolean(origin));
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Alpha-Date-Token']
 }));
 app.use(morgan('dev'));
 app.use(helmet());
@@ -40,7 +51,7 @@ app.use(errorHandler);
 // Socket.io setup
 setupSocketHandlers(io);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 

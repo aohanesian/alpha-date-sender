@@ -218,6 +218,52 @@ export class SessionManager {
     }
   }
 
+  async stopAllProcessing(socket: Socket, operatorId: string): Promise<{ success: boolean; reason?: string; stoppedProfiles?: Array<{ profileId: string; type: 'chat' | 'mail' }> }> {
+    const deviceId = this.socketDevices.get(socket.id);
+    if (!deviceId) {
+      return { success: false, reason: 'Device not registered' };
+    }
+
+    try {
+      // Get all processing states for this operator
+      const allStates = await redisService.getAllProcessingStates(operatorId);
+      const stoppedProfiles: Array<{ profileId: string; type: 'chat' | 'mail' }> = [];
+
+      // Stop each active processing session
+      for (const state of allStates) {
+        if (state.isProcessing) {
+          // Update state to indicate processing is stopped
+          state.isProcessing = false;
+          await redisService.setProcessingState(state);
+
+          // Release lock and clean up state
+          await redisService.releaseProcessingLock(operatorId, state.profileId, state.type, state.deviceId);
+          await redisService.deleteProcessingState(operatorId, state.profileId, state.type);
+
+          stoppedProfiles.push({
+            profileId: state.profileId,
+            type: state.type
+          });
+
+          // Broadcast to all devices
+          await this.broadcastToOperator(operatorId, 'processingStopped', {
+            profileId: state.profileId,
+            type: state.type,
+            deviceId: state.deviceId,
+            stoppedBy: deviceId,
+            stoppedAt: Date.now()
+          });
+        }
+      }
+
+      console.log(`All processing stopped successfully by device ${deviceId}`, { stoppedProfiles });
+      return { success: true, stoppedProfiles };
+    } catch (error) {
+      console.error('Error stopping all processing:', error);
+      return { success: false, reason: 'Failed to stop all processing' };
+    }
+  }
+
   async completeProcessing(
     operatorId: string,
     profileId: string,
