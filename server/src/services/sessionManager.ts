@@ -6,13 +6,25 @@ export class SessionManager {
   private io: Server;
   private deviceSockets: Map<string, Socket> = new Map(); // deviceId -> socket
   private socketDevices: Map<string, string> = new Map(); // socketId -> deviceId
+  private operatorSockets: Map<string, Set<string>> = new Map();
+  private initialized: boolean = false;
 
   constructor(io: Server) {
     this.io = io;
   }
 
   async initialize(): Promise<void> {
-    await redisService.connect();
+    if (this.initialized) {
+      return;
+    }
+    
+    try {
+      await redisService.connect();
+      this.initialized = true;
+    } catch (error) {
+      console.error('Failed to initialize SessionManager:', error);
+      throw error;
+    }
   }
 
   async registerDevice(socket: Socket, operatorId: string): Promise<string> {

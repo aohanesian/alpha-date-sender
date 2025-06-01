@@ -16,6 +16,7 @@ export interface GlobalProcessingState {
 class RedisService {
   public client: RedisClientType;
   private isConnected: boolean = false;
+  private connectionPromise: Promise<void> | null = null;
 
   constructor() {
     this.client = createClient({
@@ -39,14 +40,41 @@ class RedisService {
   }
 
   async connect(): Promise<void> {
-    if (!this.isConnected) {
-      await this.client.connect();
+    if (this.isConnected) {
+      return;
     }
+
+    if (this.connectionPromise) {
+      return this.connectionPromise;
+    }
+
+    this.connectionPromise = this.client.connect()
+      .then(() => {
+        this.isConnected = true;
+      })
+      .catch((error) => {
+        console.error('Failed to connect to Redis:', error);
+        this.isConnected = false;
+        throw error;
+      })
+      .finally(() => {
+        this.connectionPromise = null;
+      });
+
+    return this.connectionPromise;
   }
 
   async disconnect(): Promise<void> {
-    if (this.isConnected) {
+    if (!this.isConnected) {
+      return;
+    }
+
+    try {
       await this.client.disconnect();
+      this.isConnected = false;
+    } catch (error) {
+      console.error('Error disconnecting from Redis:', error);
+      throw error;
     }
   }
 
