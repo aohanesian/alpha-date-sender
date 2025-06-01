@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm install @types/node vite @vitejs/plugin-react typescript && tsc --project tsconfig.app.json && vite build",
-    "build:prod": "npm install @types/node vite @vitejs/plugin-react typescript && tsc --project tsconfig.app.json && vite build --mode production",
+    "build": "npm install @types/node vite @vitejs/plugin-react typescript && npm install --save-dev @types/node && tsc --project tsconfig.app.json && vite build",
+    "build:prod": "npm install @types/node vite @vitejs/plugin-react typescript && npm install --save-dev @types/node && tsc --project tsconfig.app.json && vite build --mode production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -28,7 +28,7 @@
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.5.0",
+    "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.17",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
