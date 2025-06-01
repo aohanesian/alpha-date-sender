@@ -25,7 +25,7 @@ export const verifyToken = async (token: string): Promise<CustomJwtPayload> => {
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
       throw new Error();
