@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import express from 'express';
 import axios from 'axios';
 import { AppError } from '../middleware/errorHandler';
 import { auth } from '../middleware/auth';
 import { getProfiles, updateProfile } from '../controllers/profiles';
 
-const router = Router();
+const router = express.Router();
 
 interface Profile {
   id: number;

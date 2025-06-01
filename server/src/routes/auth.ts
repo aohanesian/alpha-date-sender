@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { AppError } from '../middleware/errorHandler';
@@ -11,7 +11,7 @@ interface CustomJwtPayload {
   exp?: number;
 }
 
-const router = Router();
+const router = express.Router();
 
 interface AlphaDateLoginResponse {
   status: boolean;
