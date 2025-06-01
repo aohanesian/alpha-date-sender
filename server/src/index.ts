@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -9,7 +9,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { authRouter } from './routes/auth';
 import { profilesRouter } from './routes/profiles';
 
-const app: Application = express();
+const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
