@@ -507,7 +507,7 @@ async function fetchAllPages(
   profileId: string,
   type: 'chat' | 'mail'
 ): Promise<any[]> {
-  const allItems = [];
+  const allItems: any[] = [];
   let currentPage = 1;
   let hasMorePages = true;
   let statusMessage = '';
