@@ -13,7 +13,8 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-    "noEmit": false,
+    "noEmit": true,
+    "emitDeclarationOnly": false,
 
     /* Linting */
     "strict": true,

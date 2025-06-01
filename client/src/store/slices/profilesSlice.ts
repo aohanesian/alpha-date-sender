@@ -12,7 +12,7 @@ export interface Profile {
   status: string;
 }
 
-interface ProfilesState {
+export interface ProfilesState {
   items: Profile[];
   loading: boolean;
   error: string | null;

@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm install @types/node vite @vitejs/plugin-react typescript && tsc -b && vite build",
-    "build:prod": "npm install @types/node vite @vitejs/plugin-react typescript && tsc -b && vite build --mode production",
+    "build": "npm install @types/node vite @vitejs/plugin-react typescript && tsc --project tsconfig.app.json && vite build",
+    "build:prod": "npm install @types/node vite @vitejs/plugin-react typescript && tsc --project tsconfig.app.json && vite build --mode production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },

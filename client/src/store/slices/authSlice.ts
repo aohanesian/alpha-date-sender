@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-interface AuthState {
+export interface AuthState {
   token: string | null;
   alphaDateToken: string | null;
   operatorId: string | null;
