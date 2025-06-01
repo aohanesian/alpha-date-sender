@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from './errorHandler';
-import { CustomJwtPayload } from '../types';
+import { CustomJwtPayload } from '../types/jwt';
 
 declare global {
   namespace Express {
@@ -23,22 +23,18 @@ export const verifyToken = async (token: string): Promise<CustomJwtPayload> => {
   }
 };
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      throw new AppError('No authorization header', 401);
-    }
+    const token = req.header('Authorization')?.replace('Bearer ', '');
 
-    const token = authHeader.split(' ')[1];
     if (!token) {
-      throw new AppError('No token provided', 401);
+      throw new Error();
     }
 
-    const decoded = await verifyToken(token);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as CustomJwtPayload;
     req.user = decoded;
     next();
   } catch (error) {
-    next(error);
+    res.status(401).json({ error: 'Please authenticate.' });
   }
 }; 
