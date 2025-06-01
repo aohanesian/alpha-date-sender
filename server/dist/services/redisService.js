@@ -5,6 +5,7 @@ const redis_1 = require("redis");
 class RedisService {
     constructor() {
         this.isConnected = false;
+        this.connectionPromise = null;
         this.client = (0, redis_1.createClient)({
             url: process.env.REDIS_URL || 'redis://localhost:6379'
         });
@@ -22,13 +23,37 @@ class RedisService {
         });
     }
     async connect() {
-        if (!this.isConnected) {
-            await this.client.connect();
+        if (this.isConnected) {
+            return;
         }
+        if (this.connectionPromise) {
+            return this.connectionPromise;
+        }
+        this.connectionPromise = this.client.connect()
+            .then(() => {
+            this.isConnected = true;
+        })
+            .catch((error) => {
+            console.error('Failed to connect to Redis:', error);
+            this.isConnected = false;
+            throw error;
+        })
+            .finally(() => {
+            this.connectionPromise = null;
+        });
+        return this.connectionPromise;
     }
     async disconnect() {
-        if (this.isConnected) {
+        if (!this.isConnected) {
+            return;
+        }
+        try {
             await this.client.disconnect();
+            this.isConnected = false;
+        }
+        catch (error) {
+            console.error('Error disconnecting from Redis:', error);
+            throw error;
         }
     }
     // Processing State Management
