@@ -31,8 +31,11 @@
     /* Type Checking */
     "noImplicitAny": false,
     "allowJs": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+    /* Type Declarations */
+    "types": ["vite/client", "node"]
   },
-  "include": ["src"],
+  "include": ["src", "src/vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
