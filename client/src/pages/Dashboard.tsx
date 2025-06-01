@@ -587,25 +587,26 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleClearMailMessage = (profileId: string) => {
-    setMailMessages(prev => ({
-      ...prev,
-      [profileId]: ''
-    }));
-    setValidationErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors[`mail-validation-${profileId}`];
-      return newErrors;
-    });
+  // DO NOT REMOVE THIS FUNCTION
+  // const handleClearMailMessage = (profileId: string) => {
+  //   setMailMessages(prev => ({
+  //     ...prev,
+  //     [profileId]: ''
+  //   }));
+  //   setValidationErrors(prev => {
+  //     const newErrors = { ...prev };
+  //     delete newErrors[`mail-validation-${profileId}`];
+  //     return newErrors;
+  //   });
     
-    // Emit message clear to other devices
-    if (socketRef.current && socketRef.current.connected) {
-      socketRef.current.emit('clearMessage', {
-        profileId,
-        type: 'mail'
-      });
-    }
-  };
+  //   // Emit message clear to other devices
+  //   if (socketRef.current && socketRef.current.connected) {
+  //     socketRef.current.emit('clearMessage', {
+  //       profileId,
+  //       type: 'mail'
+  //     });
+  //   }
+  // };
 
   const handleStartChatProcessing = (profileId: string) => {
     console.log('handleStartChatProcessing called with:', {
@@ -892,11 +893,11 @@ const Dashboard: React.FC = () => {
 
   if (profilesArray.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center space-y-4">
+      <div className="flex flex-col items-center justify-center space-y-4 py-8">
         <div className="text-xl text-gray-700 dark:text-gray-300">No profiles found</div>
         <button
           onClick={handleLogout}
-          className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
         >
           Logout
         </button>
@@ -905,265 +906,257 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 gap-4">
-          {/* Chat Column */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Chat Messages</h2>
-            {profilesArray.map((profile) => (
-              <div
-                key={`chat-${profile.external_id}`}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
-              >
-                <div className="flex items-start space-x-4">
-                  <img
-                    src={profile.photo_link}
-                    alt={profile.name}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-                  <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{profile.name}, {profile.age}</h2>
-                    <p className="text-gray-600 dark:text-gray-400">ID: {profile.external_id}</p>
-                    <p className="text-gray-600 dark:text-gray-400">Location: {profile.country_name}</p>
-                    <div className="mt-4">
-                      <textarea
-                        value={chatMessages[profile.external_id] || ''}
-                        onChange={(e) => handleChatMessageChange(profile.external_id, e.target.value)}
-                        placeholder="Type your chat message here..."
-                        disabled={processingChat[profile.external_id]?.isProcessing || processingChat[profile.external_id]?.isPending}
-                        className="w-full h-24 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                      <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        <span className={
-                          (chatMessages[profile.external_id] || '').length < CHAT_MIN_LENGTH || 
-                          (chatMessages[profile.external_id] || '').length > CHAT_MAX_LENGTH 
-                            ? 'text-red-500' 
-                            : ''
-                        }>
-                          {(chatMessages[profile.external_id] || '').length}
-                        </span>
-                        /{CHAT_MAX_LENGTH} characters (min: {CHAT_MIN_LENGTH})
-                      </div>
-                      {validationErrors[`chat-validation-${profile.external_id}`] && (
-                        <div className="mt-1 text-sm text-red-500">
-                          {validationErrors[`chat-validation-${profile.external_id}`]}
-                        </div>
-                      )}
-                      <div className="mt-2 flex space-x-2">
-                        {!processingChat[profile.external_id]?.isProcessing && !processingChat[profile.external_id]?.isPending ? (
-                          <button
-                            onClick={() => handleStartChatProcessing(profile.external_id)}
-                            disabled={
-                              !chatMessages[profile.external_id] ||
-                              chatMessages[profile.external_id].length < CHAT_MIN_LENGTH ||
-                              chatMessages[profile.external_id].length > CHAT_MAX_LENGTH
-                            }
-                            className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600"
-                          >
-                            Start Chat
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleStopChatProcessing(profile.external_id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                          >
-                            {processingChat[profile.external_id]?.isPending ? 'Pending...' : 'Stop Chat'}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleClearChatBlocklist(profile.external_id)}
-                          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                        >
-                          Clear Blocklist
-                        </button>
-                      </div>
-                      {processingChat[profile.external_id] && (
-                        <div className="text-sm text-blue-600 dark:text-blue-400 mt-2 whitespace-pre-line">
-                          {processingChat[profile.external_id].status}
-                        </div>
-                      )}
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-2 gap-4">
+        {/* Chat Column */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">💕 Chat Messages</h2>
+          {profilesArray.map((profile) => (
+            <div
+              key={`chat-${profile.external_id}`}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
+            >
+              <div className="flex items-start space-x-4">
+                <img
+                  src={profile.photo_link}
+                  alt={profile.name}
+                  className="w-24 h-24 object-cover rounded-lg"
+                />
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{profile.name}, {profile.age}</h2>
+                  <p className="text-gray-600 dark:text-gray-400">ID: {profile.external_id}</p>
+                  <p className="text-gray-600 dark:text-gray-400">Location: {profile.country_name}</p>
+                  <div className="mt-4">
+                    <textarea
+                      value={chatMessages[profile.external_id] || ''}
+                      onChange={(e) => handleChatMessageChange(profile.external_id, e.target.value)}
+                      placeholder="Type your chat message here..."
+                      disabled={processingChat[profile.external_id]?.isProcessing || processingChat[profile.external_id]?.isPending}
+                      className="w-full h-24 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <span className={
+                        (chatMessages[profile.external_id] || '').length < CHAT_MIN_LENGTH || 
+                        (chatMessages[profile.external_id] || '').length > CHAT_MAX_LENGTH 
+                          ? 'text-red-500' 
+                          : ''
+                      }>
+                        {(chatMessages[profile.external_id] || '').length}
+                      </span>
+                      /{CHAT_MAX_LENGTH} characters (min: {CHAT_MIN_LENGTH})
                     </div>
+                    {validationErrors[`chat-validation-${profile.external_id}`] && (
+                      <div className="mt-1 text-sm text-red-500">
+                        {validationErrors[`chat-validation-${profile.external_id}`]}
+                      </div>
+                    )}
+                    <div className="mt-2 flex space-x-2">
+                      {!processingChat[profile.external_id]?.isProcessing && !processingChat[profile.external_id]?.isPending ? (
+                        <button
+                          onClick={() => handleStartChatProcessing(profile.external_id)}
+                          disabled={
+                            !chatMessages[profile.external_id] ||
+                            chatMessages[profile.external_id].length < CHAT_MIN_LENGTH ||
+                            chatMessages[profile.external_id].length > CHAT_MAX_LENGTH
+                          }
+                          className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600"
+                        >
+                          Start Chat
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleStopChatProcessing(profile.external_id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        >
+                          {processingChat[profile.external_id]?.isPending ? 'Pending...' : 'Stop Chat'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleClearChatBlocklist(profile.external_id)}
+                        className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 active:outline-none active:ring-2 active:ring-yellow-500 active:ring-offset-2"
+                      >
+                        Clear Blocklist
+                      </button>
+                    </div>
+                    {processingChat[profile.external_id] && (
+                      <div className="text-sm text-blue-600 dark:text-blue-400 mt-2 whitespace-pre-line">
+                        {processingChat[profile.external_id].status}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
 
-          {/* Mail Column */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Mail Messages</h2>
-            {profilesArray.map((profile) => (
-              <div
-                key={`mail-${profile.external_id}`}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
-              >
-                <div className="flex items-start space-x-4">
-                  <img
-                    src={profile.photo_link}
-                    alt={profile.name}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-                  <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{profile.name}, {profile.age}</h2>
-                    <p className="text-gray-600 dark:text-gray-400">ID: {profile.external_id}</p>
-                    <p className="text-gray-600 dark:text-gray-400">Location: {profile.country_name}</p>
-                    <div className="mt-4">
-                      <textarea
-                        value={mailMessages[profile.external_id] || ''}
-                        onChange={(e) => handleMailMessageChange(profile.external_id, e.target.value)}
-                        placeholder="Type your mail message here..."
-                        disabled={processingMail[profile.external_id]?.isProcessing || processingMail[profile.external_id]?.isPending}
-                        className="w-full h-24 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                      <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        <span className={
-                          (mailMessages[profile.external_id] || '').length < MAIL_MIN_LENGTH || 
-                          (mailMessages[profile.external_id] || '').length > MAIL_MAX_LENGTH 
-                            ? 'text-red-500' 
-                            : ''
-                        }>
-                          {(mailMessages[profile.external_id] || '').length}
-                        </span>
-                        /{MAIL_MAX_LENGTH} characters (min: {MAIL_MIN_LENGTH})
+        {/* Mail Column */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">💌 Mail Messages</h2>
+          {profilesArray.map((profile) => (
+            <div
+              key={`mail-${profile.external_id}`}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm"
+            >
+              <div className="flex items-start space-x-4">
+                <img
+                  src={profile.photo_link}
+                  alt={profile.name}
+                  className="w-24 h-24 object-cover rounded-lg"
+                />
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{profile.name}, {profile.age}</h2>
+                  <p className="text-gray-600 dark:text-gray-400">ID: {profile.external_id}</p>
+                  <p className="text-gray-600 dark:text-gray-400">Location: {profile.country_name}</p>
+                  <div className="mt-4">
+                    <textarea
+                      value={mailMessages[profile.external_id] || ''}
+                      onChange={(e) => handleMailMessageChange(profile.external_id, e.target.value)}
+                      placeholder="Type your mail message here..."
+                      disabled={processingMail[profile.external_id]?.isProcessing || processingMail[profile.external_id]?.isPending}
+                      className="w-full h-24 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      <span className={
+                        (mailMessages[profile.external_id] || '').length < MAIL_MIN_LENGTH || 
+                        (mailMessages[profile.external_id] || '').length > MAIL_MAX_LENGTH 
+                          ? 'text-red-500' 
+                          : ''
+                      }>
+                        {(mailMessages[profile.external_id] || '').length}
+                      </span>
+                      /{MAIL_MAX_LENGTH} characters (min: {MAIL_MIN_LENGTH})
+                    </div>
+                    {validationErrors[`mail-validation-${profile.external_id}`] && (
+                      <div className="mt-1 text-sm text-red-500">
+                        {validationErrors[`mail-validation-${profile.external_id}`]}
                       </div>
-                      {validationErrors[`mail-validation-${profile.external_id}`] && (
-                        <div className="mt-1 text-sm text-red-500">
-                          {validationErrors[`mail-validation-${profile.external_id}`]}
-                        </div>
-                      )}
-                      <div className="mt-2 flex items-center gap-2">
-                        <button
-                          onClick={() => handleRefreshAttachments(profile.external_id)}
-                          disabled={refreshingAttachments[profile.external_id]}
-                          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {refreshingAttachments[profile.external_id] ? 'Refreshing...' : 'Refresh Attachments'}
-                        </button>
-                      </div>
-                      <div className="mt-2">
-                        {attachments[profile.external_id] ? (
-                          Object.entries(attachments[profile.external_id]).some(([_, items]) => items.length > 0) ? (
-                            <>
-                              <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                                Selected attachments: 
-                                <span className={
-                                  (selectedAttachments[profile.external_id]?.size || 0) > MAIL_MAX_ATTACHMENTS
-                                    ? 'text-red-500 font-semibold'
-                                    : 'font-semibold'
-                                }>
-                                  {' '}{selectedAttachments[profile.external_id]?.size || 0}/{MAIL_MAX_ATTACHMENTS}
-                                </span>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {Object.entries(attachments[profile.external_id]).map(([type, items]) => (
-                                  items.map((item: Attachment) => (
-                                    <div key={item.id} className="relative group">
-                                      <div className="w-24 h-24 relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900">
-                                        {type === 'images' && (
+                    )}
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        onClick={() => handleRefreshAttachments(profile.external_id)}
+                        disabled={refreshingAttachments[profile.external_id]}
+                        className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {refreshingAttachments[profile.external_id] ? 'Refreshing...' : 'Refresh Attachments'}
+                      </button>
+                    </div>
+                    <div className="mt-2">
+                      {attachments[profile.external_id] ? (
+                        Object.entries(attachments[profile.external_id]).some(([_, items]) => items.length > 0) ? (
+                          <>
+                            <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                              Selected attachments: 
+                              <span className={
+                                (selectedAttachments[profile.external_id]?.size || 0) > MAIL_MAX_ATTACHMENTS
+                                  ? 'text-red-500 font-semibold'
+                                  : 'font-semibold'
+                              }>
+                                {' '}{selectedAttachments[profile.external_id]?.size || 0}/{MAIL_MAX_ATTACHMENTS}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {Object.entries(attachments[profile.external_id]).map(([type, items]) => (
+                                items.map((item: Attachment) => (
+                                  <div key={item.id} className="relative group">
+                                    <div className="w-24 h-24 relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900">
+                                      {type === 'images' && (
+                                        <img
+                                          src={item.link}
+                                          alt={item.filename}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      )}
+                                      {type === 'videos' && (
+                                        <div className="relative w-full h-full">
                                           <img
-                                            src={item.link}
+                                            src={item.thumb_link || item.link}
                                             alt={item.filename}
                                             className="w-full h-full object-cover"
                                           />
-                                        )}
-                                        {type === 'videos' && (
-                                          <div className="relative w-full h-full">
-                                            <img
-                                              src={item.thumb_link || item.link}
-                                              alt={item.filename}
-                                              className="w-full h-full object-cover"
-                                            />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
-                                              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                                              </svg>
-                                            </div>
+                                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                            </svg>
                                           </div>
-                                        )}
-                                        {type === 'audios' && (
-                                          <div className="w-full h-full flex items-center justify-center">
-                                            <MusicalNoteIcon className="w-8 h-8 text-gray-400" />
-                                          </div>
-                                        )}
-                                        <div className="absolute top-1 right-1">
-                                          <input
-                                            type="checkbox"
-                                            checked={selectedAttachments[profile.external_id]?.has(item.id) || false}
-                                            onChange={() => handleAttachmentSelect(profile.external_id, item.id)}
-                                            disabled={processingMail[profile.external_id]?.isProcessing || processingMail[profile.external_id]?.isPending}
-                                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                          />
                                         </div>
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
-                                          {type.slice(0, -1)}
+                                      )}
+                                      {type === 'audios' && (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                          <MusicalNoteIcon className="w-8 h-8 text-gray-400" />
                                         </div>
+                                      )}
+                                      <div className="absolute top-1 right-1">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedAttachments[profile.external_id]?.has(item.id) || false}
+                                          onChange={() => handleAttachmentSelect(profile.external_id, item.id)}
+                                          disabled={processingMail[profile.external_id]?.isProcessing || processingMail[profile.external_id]?.isPending}
+                                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        />
                                       </div>
-                                      <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 truncate max-w-24">
-                                        {item.filename}
+                                      <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
+                                        {type.slice(0, -1)}
                                       </div>
                                     </div>
-                                  ))
-                                ))}
-                              </div>
-                            </>
-                          ) : (
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              Add attachments to "send" folder and click Refresh
+                                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 truncate max-w-24">
+                                      {item.filename}
+                                    </div>
+                                  </div>
+                                ))
+                              ))}
                             </div>
-                          )
+                          </>
                         ) : (
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             Add attachments to "send" folder and click Refresh
                           </div>
-                        )}
-                      </div>
-                      <div className="mt-2 flex space-x-2">
-                        {!processingMail[profile.external_id]?.isProcessing && !processingMail[profile.external_id]?.isPending ? (
-                          <button
-                            onClick={() => handleStartMailProcessing(profile.external_id)}
-                            disabled={
-                              !mailMessages[profile.external_id] ||
-                              mailMessages[profile.external_id].length < MAIL_MIN_LENGTH ||
-                              mailMessages[profile.external_id].length > MAIL_MAX_LENGTH ||
-                              (selectedAttachments[profile.external_id]?.size || 0) > MAIL_MAX_ATTACHMENTS
-                            }
-                            className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600"
-                          >
-                            Start Mail
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleStopMailProcessing(profile.external_id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                          >
-                            {processingMail[profile.external_id]?.isPending ? 'Pending...' : 'Stop Mail'}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleClearMailBlocklist(profile.external_id)}
-                          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-                        >
-                          Clear Blocklist
-                        </button>
-                        <button
-                          onClick={() => handleClearMailMessage(profile.external_id)}
-                          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                        >
-                          Clear Message
-                        </button>
-                      </div>
-                      {processingMail[profile.external_id] && (
-                        <div className="text-sm text-blue-600 dark:text-blue-400 mt-2 whitespace-pre-line">
-                          {processingMail[profile.external_id].status}
+                        )
+                      ) : (
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          Add attachments to "send" folder and click Refresh
                         </div>
                       )}
                     </div>
+                    <div className="mt-2 flex space-x-2">
+                      {!processingMail[profile.external_id]?.isProcessing && !processingMail[profile.external_id]?.isPending ? (
+                        <button
+                          onClick={() => handleStartMailProcessing(profile.external_id)}
+                          disabled={
+                            !mailMessages[profile.external_id] ||
+                            mailMessages[profile.external_id].length < MAIL_MIN_LENGTH ||
+                            mailMessages[profile.external_id].length > MAIL_MAX_LENGTH ||
+                            (selectedAttachments[profile.external_id]?.size || 0) > MAIL_MAX_ATTACHMENTS
+                          }
+                          className="bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-600"
+                        >
+                          Start Mail
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleStopMailProcessing(profile.external_id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                        >
+                          {processingMail[profile.external_id]?.isPending ? 'Pending...' : 'Stop Mail'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleClearMailBlocklist(profile.external_id)}
+                           className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 active:outline-none active:ring-2 active:ring-yellow-500 active:ring-offset-2"
+                      >
+                        Clear Blocklist
+                      </button>
+                    </div>
+                    {processingMail[profile.external_id] && (
+                      <div className="text-sm text-blue-600 dark:text-blue-400 mt-2 whitespace-pre-line">
+                        {processingMail[profile.external_id].status}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
