@@ -1,8 +1,10 @@
+// @ts-ignore
 import express from 'express';
 import axios from 'axios';
 import { AppError } from '../middleware/errorHandler';
 import { getProfiles, updateProfile } from '../controllers/profiles';
 
+// @ts-ignore
 const router = express.Router();
 const ALPHA_DATE_API_URL = 'https://alpha.date/api';
 

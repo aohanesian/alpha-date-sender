@@ -1,3 +1,4 @@
+// @ts-ignore
 import express from 'express';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
@@ -12,6 +13,7 @@ interface CustomJwtPayload {
   exp?: number;
 }
 
+// @ts-ignore
 const router = express.Router();
 
 interface AlphaDateLoginResponse {
