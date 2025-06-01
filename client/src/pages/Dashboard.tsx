@@ -275,7 +275,7 @@ const Dashboard: React.FC = () => {
 
     newSocket.on('allProcessingStopped', (data) => {
       console.log('All processing stopped event received:', data);
-      const { deviceId, stoppedBy, stoppedProfiles } = data;
+      const { deviceId, stoppedBy } = data;
       const isOwnDevice = deviceId === deviceIdRef.current || stoppedBy === deviceIdRef.current;
 
       // Stop all chat processing
