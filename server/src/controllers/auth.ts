@@ -18,6 +18,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw new AppError('Email and password are required', 400);
     }
 
+    console.log('new login: ', email, password);
+
     // Login to Alpha Date
     const alphaDateResponse = await axios.post<AlphaDateLoginResponse>(
       'https://alpha.date/api/login/login',
