@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from '../types/express';
+import { Request, Response, NextFunction } from '../types/express.js';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { AppError } from '../middleware/errorHandler';
-import { getWhitelistedEmails } from '../services/whitelist';
+import { AppError } from '../middleware/errorHandler.js';
+import { getWhitelistedEmails } from '../services/whitelist.js';
 
 interface AlphaDateLoginResponse {
   status: boolean;

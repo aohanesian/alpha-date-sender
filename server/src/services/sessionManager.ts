@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { redisService, GlobalProcessingState } from './redisService';
+import { redisService, GlobalProcessingState } from './redisService.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export class SessionManager {
