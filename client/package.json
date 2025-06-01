@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm install && tsc --project tsconfig.app.json && npx vite build",
-    "build:prod": "npm install && tsc --project tsconfig.app.json && npx vite build --mode production",
+    "build": "npm install && npm install vite && tsc --project tsconfig.app.json && npx vite build",
+    "build:prod": "npm install && npm install vite && tsc --project tsconfig.app.json && npx vite build --mode production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -20,7 +20,8 @@
     "react-hot-toast": "^2.5.2",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "vite": "^6.3.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
@@ -38,7 +39,6 @@
     "tailwindcss": "^3.4.1",
     "terser": "^5.40.0",
     "typescript": "~5.8.3",
-    "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "typescript-eslint": "^8.30.1"
   }
 }
