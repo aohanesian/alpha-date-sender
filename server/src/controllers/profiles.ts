@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from '../types/express';
+import { Request, Response, NextFunction } from '../types/express.js';
 import axios from 'axios';
-import { AppError } from '../middleware/errorHandler';
+import { AppError } from '../middleware/errorHandler.js';
 
 interface Profile {
   id: string;
