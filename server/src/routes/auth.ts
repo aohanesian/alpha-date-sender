@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { AppError } from '../middleware/errorHandler';
 import { auth } from '../middleware/auth';
 import { login, register } from '../controllers/auth';
+import { validateLogin, validateRegister } from '../middleware/validation';
 
 interface CustomJwtPayload {
   operatorId: string;
@@ -65,8 +66,8 @@ async function getWhitelistedEmails(): Promise<string[]> {
   }
 }
 
-router.post('/login', login);
-router.post('/register', register);
+router.post('/login', validateLogin, login);
+router.post('/register', validateRegister, register);
 
 // Refresh token endpoint
 router.post('/refresh', auth, async (req, res) => {
@@ -105,4 +106,4 @@ router.post('/refresh', auth, async (req, res) => {
   }
 });
 
-export { router as authRouter }; 
+export default router; 

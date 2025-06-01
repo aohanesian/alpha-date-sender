@@ -90,4 +90,4 @@ router.get('/:profileId/attachments', async (req, res, next) => {
 
 router.put('/:id', updateProfile);
 
-export { router as profilesRouter }; 
+export default router; 
