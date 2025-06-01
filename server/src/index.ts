@@ -4,12 +4,12 @@ import cors from 'cors';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { setupSocketHandlers } from './socket';
+import { setupSocketHandlers } from './socket.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import authRoutes from './routes/auth';
-import profilesRoutes from './routes/profiles';
-import { errorHandler } from './middleware/errorHandler';
+import authRoutes from './routes/auth.js';
+import profilesRoutes from './routes/profiles.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 // @ts-ignore
 const app = express();

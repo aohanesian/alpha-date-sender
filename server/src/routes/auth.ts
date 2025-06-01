@@ -2,10 +2,10 @@
 import express from 'express';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { AppError } from '../middleware/errorHandler';
-import { auth } from '../middleware/auth';
-import { login, register } from '../controllers/auth';
-import { validateLogin, validateRegister } from '../middleware/validation';
+import { AppError } from '../middleware/errorHandler.js';
+import { auth } from '../middleware/auth.js';
+import { login, register } from '../controllers/auth.js';
+import { validateLogin, validateRegister } from '../middleware/validation.js';
 
 interface CustomJwtPayload {
   operatorId: string;

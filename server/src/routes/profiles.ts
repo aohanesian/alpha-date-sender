@@ -1,8 +1,8 @@
 // @ts-ignore
 import express from 'express';
 import axios from 'axios';
-import { AppError } from '../middleware/errorHandler';
-import { getProfiles, updateProfile } from '../controllers/profiles';
+import { AppError } from '../middleware/errorHandler.js';
+import { getProfiles, updateProfile } from '../controllers/profiles.js';
 
 // @ts-ignore
 const router = express.Router();
