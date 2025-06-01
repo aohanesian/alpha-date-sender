@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import axios from 'axios';
 import { AppError } from '../middleware/errorHandler';
+import { auth } from '../middleware/auth';
+import { getProfiles, updateProfile } from '../controllers/profiles';
 
 const router = Router();
 
@@ -31,52 +33,7 @@ interface Folder {
 }
 
 // Get profiles
-router.get('/', async (req, res, next) => {
-  try {
-    const alphaDateToken = req.headers['x-alpha-date-token'];
-    console.log('Profiles request received:', {
-      hasAlphaDateToken: !!alphaDateToken,
-      alphaDateTokenLength: alphaDateToken?.length,
-      url: `${process.env.ALPHA_DATE_API_URL}/operator/profiles`
-    });
-
-    if (!alphaDateToken) {
-      throw new AppError('Alpha Date token is required', 401);
-    }
-
-    const response = await axios.get<Profile[]>(
-      `${process.env.ALPHA_DATE_API_URL}/operator/profiles`,
-      {
-        headers: {
-          'Authorization': `Bearer ${alphaDateToken}`
-        }
-      }
-    );
-
-    console.log('Alpha Date API response:', {
-      status: response.status,
-      dataLength: response.data?.length,
-      hasData: !!response.data
-    });
-
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error in profiles route:', error);
-    if (axios.isAxiosError(error)) {
-      console.error('Axios error details:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        config: {
-          url: error.config?.url,
-          headers: error.config?.headers
-        }
-      });
-      next(new AppError(error.response?.data?.message || 'Failed to fetch profiles', error.response?.status || 500));
-    } else {
-      next(error);
-    }
-  }
-});
+router.get('/', auth, getProfiles);
 
 // Get attachments
 router.get('/:profileId/attachments', async (req, res, next) => {
@@ -131,4 +88,6 @@ router.get('/:profileId/attachments', async (req, res, next) => {
   }
 });
 
-export const profileRouter = router; 
+router.put('/:id', auth, updateProfile);
+
+export { router as profilesRouter }; 

@@ -6,9 +6,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupSocketHandlers } from './socket';
 import { errorHandler } from './middleware/errorHandler';
-import authRoutes from './routes/auth';
-import profilesRoutes from './routes/profiles';
-import { Request, Response, NextFunction } from 'express';
+import { authRouter } from './routes/auth';
+import { profilesRouter } from './routes/profiles';
 
 const app = express();
 const httpServer = createServer(app);
@@ -32,8 +31,8 @@ app.use(helmet());
 app.use(express.static('public'));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/profiles', profilesRoutes);
+app.use('/api/auth', authRouter);
+app.use('/api/profiles', profilesRouter);
 
 // Error handling
 app.use(errorHandler);
