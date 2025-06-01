@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
-    "build:prod": "npm run build && npm run copy-files",
+    "build": "npm install && tsc",
+    "build:prod": "npm install && tsc && npm run copy-files",
     "copy-files": "cp package.json dist/ && cp .env dist/",
     "clean": "rimraf dist",
     "lint": "eslint . --ext .ts",
